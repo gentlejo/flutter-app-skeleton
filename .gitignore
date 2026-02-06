@@ -45,7 +45,6 @@ app.*.map.json
 /android/app/release
 
 # Firebase generated files
-**/firebase_options.dart
 **/google-services.json
 **/GoogleService-Info.plist
 firebase.json

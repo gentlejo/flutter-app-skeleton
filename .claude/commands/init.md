@@ -396,7 +396,7 @@ android/key.properties
 .env.*
 ```
 
-These should already be present from the template `.gitignore`. Verify and add any missing entries.
+Add `**/firebase_options.dart` to .gitignore (the template tracks the placeholder, but after init the generated file should be ignored). The other entries should already be present from the template `.gitignore`. Verify and add any missing entries.
 
 ---
 
