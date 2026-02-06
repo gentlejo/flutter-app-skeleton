@@ -2,30 +2,27 @@
 
 Initialize this skeleton template into a real Flutter project. This template contains only Dart source files — platform files (android/, ios/, pubspec.yaml, etc.) are generated fresh by `flutter create` to match the user's current Flutter SDK version.
 
+The Flutter client lives under `app/`. All flutter commands run from within `app/`.
+
 Follow these steps exactly in order.
 
 ---
 
 ## Step 1: Gather Project Information
 
-Use AskUserQuestion to collect ALL of the following at once (4 questions):
+Use AskUserQuestion to collect ALL of the following at once (3 questions):
 
-**Question 1: Dart Package Name**
-- Header: "Package"
-- Question: "What is the Dart package name? (snake_case, e.g., my_app)"
-- Options: "my_app", "cool_project"
+**Question 1: Bundle ID**
+- Header: "Bundle ID"
+- Question: "What is the full bundle identifier? (e.g., com.gentlejo.myapp)"
+- Options: "com.gentlejo.myapp", "com.company.coolapp"
 
 **Question 2: App Display Name**
-- Header: "Display Name"
-- Question: "What is the app display name? (shown to users, e.g., My App)"
-- Options: "My App", "Cool Project"
+- Header: "App Name"
+- Question: "What is the app display name shown to users? (e.g., My App)"
+- Options: "My App", "Cool App"
 
-**Question 3: Package Identifier**
-- Header: "Bundle ID"
-- Question: "What is the package identifier? (reverse domain, e.g., com.company.myapp)"
-- Options: "com.company.myapp", "me.developer.app"
-
-**Question 4: Optional Features**
+**Question 3: Optional Features**
 - Header: "Features"
 - Question: "Which optional features do you want to enable?"
 - multiSelect: true
@@ -36,50 +33,53 @@ Use AskUserQuestion to collect ALL of the following at once (4 questions):
   - "App Tracking" — iOS App Tracking Transparency (key: `app_tracking`)
   - "Deep Linking" — Universal links / App links (key: `deep_linking`)
 
-Store all answers for use in subsequent steps.
+### Derived values (do NOT ask the user):
+From the bundle ID, automatically derive:
+- **org**: everything before the last dot (e.g., `com.gentlejo.myapp` → `com.gentlejo`)
+- **dart_package_name**: the last segment (e.g., `com.gentlejo.myapp` → `myapp`)
+
+Store all answers and derived values for use in subsequent steps.
 
 ---
 
 ## Step 2: Generate Flutter Project
 
-Extract org and name from the user's bundle ID. For example, if bundle ID is `com.company.myapp`:
-- org = `com.company`
-- project-name = user's Dart package name from Question 1
+Use the derived values from Step 1:
 
-Run:
+Run from within `app/`:
 ```bash
-flutter create --org {org} --project-name {dart_package_name} .
+cd app && flutter create --org {org} --project-name {dart_package_name} .
 ```
 
 This generates all platform files (android/, ios/, pubspec.yaml, etc.) using the user's current Flutter SDK version. Our existing `lib/` files are preserved (flutter create skips existing files).
 
 After flutter create:
-- Delete `test/widget_test.dart` (references the generated counter app, not our template)
-- Keep `test/` directory
+- Delete `app/test/widget_test.dart` (references the generated counter app, not our template)
+- Keep `app/test/` directory
 
 ---
 
 ## Step 3: Rename Dart Package References
 
-Replace `skeleton_app` with the user's Dart package name in ALL `.dart` files under `lib/`:
+Replace `skeleton_app` with the user's Dart package name in ALL `.dart` files under `app/lib/`:
 - All `import 'package:skeleton_app/` → `import 'package:{new_package_name}/`
 - All `export 'package:skeleton_app/` → `export 'package:{new_package_name}/` (if any)
 
 Replace display name references:
-- `'Skeleton App'` and `"Skeleton App"` → `'{display_name}'` in `lib/app.dart`
-- `"Skeleton App Dev"` → `"{display_name} Dev"` in `lib/common/config.dart`
-- `"Skeleton App"` → `"{display_name}"` in `lib/common/config.dart` (prodVariables)
+- `'Skeleton App'` and `"Skeleton App"` → `'{display_name}'` in `app/lib/app.dart`
+- `"Skeleton App Dev"` → `"{display_name} Dev"` in `app/lib/common/config.dart`
+- `"Skeleton App"` → `"{display_name}"` in `app/lib/common/config.dart` (prodVariables)
 
-Update `lib/config/firebase_options.dart`:
+Update `app/lib/config/firebase_options.dart`:
 - Replace `com.example.skeletonApp` with the user's bundle ID in `iosBundleId`
 
 ---
 
 ## Step 4: Patch pubspec.yaml
 
-The generated pubspec.yaml has basic Flutter dependencies. Add our additional dependencies.
+The generated `app/pubspec.yaml` has basic Flutter dependencies. Add our additional dependencies.
 
-Read the generated `pubspec.yaml`, then add the following dependencies after the `cupertino_icons` line:
+Read the generated `app/pubspec.yaml`, then add the following dependencies after the `cupertino_icons` line:
 
 ```yaml
   # Firebase
@@ -112,7 +112,7 @@ Read the generated `pubspec.yaml`, then add the following dependencies after the
   # --- END: deep_linking ---
 ```
 
-Also add at the end of pubspec.yaml (after the `flutter:` section):
+Also add at the end of `app/pubspec.yaml` (after the `flutter:` section):
 
 ```yaml
 flutter_native_splash:
@@ -126,7 +126,7 @@ flutter_native_splash:
 
 ## Step 5: Patch Android Configuration
 
-### 5.1 `android/settings.gradle.kts`
+### 5.1 `app/android/settings.gradle.kts`
 
 Add Firebase plugin declarations in the `plugins` block. Find the existing `plugins { ... }` section and add these lines before the closing `}`:
 
@@ -135,7 +135,7 @@ Add Firebase plugin declarations in the `plugins` block. Find the existing `plug
     id("com.google.firebase.crashlytics") version "3.0.3" apply false
 ```
 
-### 5.2 `android/app/build.gradle.kts`
+### 5.2 `app/android/app/build.gradle.kts`
 
 Add these plugin IDs inside the `plugins { ... }` block, after the existing plugins:
 
@@ -151,7 +151,7 @@ Add inside `defaultConfig { ... }` block:
         // --- END: admob ---
 ```
 
-### 5.3 `android/app/src/main/AndroidManifest.xml`
+### 5.3 `app/android/app/src/main/AndroidManifest.xml`
 
 Add BEFORE the `<application` tag:
 ```xml
@@ -188,7 +188,7 @@ Add INSIDE the main `<activity>` tag, after the existing `<intent-filter>`:
 
 ## Step 6: Patch iOS Configuration
 
-### 6.1 `ios/Runner/Info.plist`
+### 6.1 `app/ios/Runner/Info.plist`
 
 Add the following entries BEFORE the closing `</dict>` tag:
 
@@ -265,16 +265,16 @@ Kotlin/Gradle files:
 
 | Feature | Key | Service File |
 |---------|-----|-------------|
-| Push Notifications | `push_notifications` | `lib/services/notification_service.dart` |
-| AdMob | `admob` | `lib/services/admob_service.dart` |
-| In-App Purchases | `in_app_purchases` | `lib/services/purchase_service.dart` |
-| App Tracking | `app_tracking` | `lib/services/att_service.dart` |
-| Deep Linking | `deep_linking` | `lib/features/deep_linking.dart` |
+| Push Notifications | `push_notifications` | `app/lib/services/notification_service.dart` |
+| AdMob | `admob` | `app/lib/services/admob_service.dart` |
+| In-App Purchases | `in_app_purchases` | `app/lib/services/purchase_service.dart` |
+| App Tracking | `app_tracking` | `app/lib/services/att_service.dart` |
+| Deep Linking | `deep_linking` | `app/lib/features/deep_linking.dart` |
 
 ### For each UNSELECTED feature:
 1. Delete the entire block from `OPTIONAL: {key}` to `END: {key}` (inclusive) in ALL files that contain it
 2. Delete the service/feature file listed above
-3. If the `lib/features/` or `lib/services/` directory becomes empty, remove it
+3. If the `app/lib/features/` or `app/lib/services/` directory becomes empty, remove it
 
 ### For each SELECTED feature:
 1. Remove ONLY the marker comment lines (keep the code between them)
@@ -283,20 +283,20 @@ Kotlin/Gradle files:
    - Delete lines containing `# --- OPTIONAL: {key} ---` and `# --- END: {key} ---`
 
 ### Files to process for markers:
-- `lib/common/config.dart`
-- `lib/initialize.dart`
-- `lib/app.dart`
-- `pubspec.yaml`
-- `android/app/build.gradle.kts`
-- `android/app/src/main/AndroidManifest.xml`
-- `ios/Runner/Info.plist`
+- `app/lib/common/config.dart`
+- `app/lib/initialize.dart`
+- `app/lib/app.dart`
+- `app/pubspec.yaml`
+- `app/android/app/build.gradle.kts`
+- `app/android/app/src/main/AndroidManifest.xml`
+- `app/ios/Runner/Info.plist`
 
 ---
 
 ## Step 8: Install Dependencies
 
 ```bash
-flutter pub get
+cd app && flutter pub get
 ```
 
 Fix any dependency resolution issues if they arise.
@@ -316,18 +316,18 @@ Use AskUserQuestion:
 
 If yes:
 ```bash
-flutterfire configure
+cd app && flutterfire configure
 ```
 
 If skipped, remind the user:
-> Remember to run `flutterfire configure` before building the app. The placeholder firebase_options.dart will throw at runtime until configured.
+> Remember to run `flutterfire configure` inside `app/` before building the app. The placeholder firebase_options.dart will throw at runtime until configured.
 
 ---
 
 ## Step 10: Validate
 
 ```bash
-flutter analyze
+cd app && flutter analyze
 ```
 
 Fix any issues found. Common issues:
@@ -346,14 +346,21 @@ Replace `.claude/CLAUDE.md` with project-specific content:
 
 Package: `{dart_package_name}` | Bundle ID: `{bundle_id}`
 
-## Architecture
-- Environment config: `lib/common/config.dart` (dev/prod variables + static getters)
-- Entry points: `lib/main_dev.dart` (dev), `lib/main_prod.dart` (prod)
-- Service initialization: `lib/initialize.dart` (Firebase, error handling, services)
-- Root widget: `lib/app.dart`
+## Structure
+```
+app/          # Flutter client
+backend/      # Backend server
+```
+
+## App Architecture
+- Environment config: `app/lib/common/config.dart` (dev/prod variables + static getters)
+- Entry points: `app/lib/main_dev.dart` (dev), `app/lib/main_prod.dart` (prod)
+- Service initialization: `app/lib/initialize.dart` (Firebase, error handling, services)
+- Root widget: `app/lib/app.dart`
 
 ## Build & Run
 ```
+cd app
 flutter run -t lib/main_dev.dart          # Development
 flutter run -t lib/main_prod.dart         # Production
 flutter build apk -t lib/main_prod.dart   # Android release
@@ -377,7 +384,7 @@ flutter analyze                           # Static analysis
 
 ## Step 12: Update .gitignore
 
-Ensure `.gitignore` contains entries for:
+Ensure `app/.gitignore` contains entries for:
 ```
 # Firebase generated files
 **/firebase_options.dart
@@ -396,7 +403,7 @@ android/key.properties
 .env.*
 ```
 
-Add `**/firebase_options.dart` to .gitignore (the template tracks the placeholder, but after init the generated file should be ignored). The other entries should already be present from the template `.gitignore`. Verify and add any missing entries.
+Add `**/firebase_options.dart` to `app/.gitignore` (the template tracks the placeholder, but after init the generated file should be ignored). The other entries should already be present from the template `.gitignore`. Verify and add any missing entries.
 
 ---
 
@@ -404,7 +411,7 @@ Add `**/firebase_options.dart` to .gitignore (the template tracks the placeholde
 
 - Delete this init command file: `.claude/commands/init.md`
 - If `.claude/commands/` is empty after deletion, remove the directory
-- Delete `lib/config/firebase_options.dart` placeholder IF `flutterfire configure` was run (it generates the real one)
+- Delete `app/lib/config/firebase_options.dart` placeholder IF `flutterfire configure` was run (it generates the real one)
 
 ---
 
@@ -415,4 +422,4 @@ Report to the user:
 - Which features were enabled
 - Whether Firebase was configured
 - Next steps (if Firebase was skipped, remind them)
-- How to run: `flutter run -t lib/main_dev.dart`
+- How to run: `cd app && flutter run -t lib/main_dev.dart`
