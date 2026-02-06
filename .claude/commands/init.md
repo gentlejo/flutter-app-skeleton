@@ -305,21 +305,28 @@ Fix any dependency resolution issues if they arise.
 
 ## Step 9: Firebase Configuration
 
-Ask the user if they want to configure Firebase now:
+`flutterfire configure` is an interactive CLI that requires option selection (arrow keys, spacebar), which does NOT work inside Claude CLI. The user must run it in a separate terminal.
 
-Use AskUserQuestion:
-- Header: "Firebase"
-- Question: "Configure Firebase now? You need Firebase CLI and FlutterFire CLI installed."
-- Options:
-  - "Yes, configure now" — Will run flutterfire configure
-  - "Skip for now" — Will remind user to run it later
+Guide the user with this message:
 
-If yes:
-```bash
-cd app && flutterfire configure
-```
+> **Firebase 설정이 필요합니다.**
+>
+> `flutterfire configure`는 인터랙티브 CLI라서 Claude Code 안에서 실행할 수 없습니다.
+> 별도 터미널을 열어서 아래 명령어를 실행해 주세요:
+>
+> ```bash
+> cd {absolute_path_to_project}/app && flutterfire configure --out=lib/config/firebase_options.dart
+> ```
+>
+> (`--out` 옵션으로 기존 placeholder 위치에 파일이 생성됩니다. import 경로 변경이 필요 없습니다.)
+>
+> 완료되면 여기서 "done"이라고 입력해 주세요. 건너뛰려면 "skip"이라고 입력해 주세요.
 
-If skipped, remind the user:
+Wait for the user to respond before proceeding. Do NOT attempt to run `flutterfire configure` via Bash.
+
+If the user says "done" or equivalent, continue to Step 10.
+
+If the user says "skip" or equivalent, remind the user:
 > Remember to run `flutterfire configure` inside `app/` before building the app. The placeholder firebase_options.dart will throw at runtime until configured.
 
 ---
@@ -411,7 +418,7 @@ Add `**/firebase_options.dart` to `app/.gitignore` (the template tracks the plac
 
 - Delete this init command file: `.claude/commands/init.md`
 - If `.claude/commands/` is empty after deletion, remove the directory
-- Delete `app/lib/config/firebase_options.dart` placeholder IF `flutterfire configure` was run (it generates the real one)
+- (firebase_options.dart placeholder는 `--out` 옵션으로 같은 경로에 덮어쓰기되므로 별도 삭제 불필요)
 
 ---
 
