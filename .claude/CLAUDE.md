@@ -75,3 +75,6 @@ Features are wrapped in `// --- OPTIONAL: key ---` markers. During init, unselec
 ## Backend
 
 The `backend/` directory is intentionally empty. It will be initialized separately based on the backend technology chosen for each project (e.g., Node.js, Python, Go, etc.).
+
+### Conventions
+- **ORM 사용 금지**: ORM(Sequelize, TypeORM, Prisma, SQLAlchemy, GORM 등)을 절대 사용하지 않는다. 모든 데이터베이스 접근은 raw SQL 또는 query builder를 사용한다.
