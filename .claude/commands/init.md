@@ -300,6 +300,11 @@ Kotlin/Gradle files:
 cd app && flutter pub get
 ```
 
+Then update CocoaPods spec repo and install pods (prevents "spec not found" errors with newer plugin versions):
+```bash
+cd app/ios && pod install --repo-update
+```
+
 Fix any dependency resolution issues if they arise.
 
 ---
