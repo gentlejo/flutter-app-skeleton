@@ -71,6 +71,7 @@ Features are wrapped in `// --- OPTIONAL: key ---` markers. During init, unselec
 - Services: singleton pattern with `ClassName.instance`
 - Config: `Config.xxx` static getters (set environment in main_*.dart)
 - Firebase: configured via `flutterfire configure` CLI — do NOT edit manually
+- **Drift(SQLite)**: `sqlite3_flutter_libs`와 `sqlcipher_flutter_libs`를 동시에 사용하지 않는다. 둘 다 같은 iOS 플러그인 클래스명을 등록하여 빌드 충돌 발생. 암호화 DB(SQLCipher)가 필요하면 `sqlcipher_flutter_libs`만, 필요 없으면 `sqlite3_flutter_libs`만 사용한다.
 
 ## Backend
 
