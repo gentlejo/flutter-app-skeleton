@@ -56,6 +56,7 @@ This generates all platform files (android/, ios/, pubspec.yaml, etc.) using the
 After flutter create:
 - Delete `app/test/widget_test.dart` (references the generated counter app, not our template)
 - Keep `app/test/` directory
+- Patch `app/ios/Podfile`: find the line `# platform :ios, ...` (commented out) or `platform :ios, ...` and replace it with `platform :ios, '15.0'` (Firebase plugins require iOS 15.0+)
 
 ---
 
